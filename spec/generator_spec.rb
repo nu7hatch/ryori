@@ -52,4 +52,30 @@ describe "Ryori generator" do
       File.should be_exists(dir+"/foo/bar.sh")
     end
   end
+  
+  it "should be able to generate file from given template" do 
+    within_tmp do |dir|
+      gen = mock_gen
+      foo_txt_tt = "This is <%= 'example' %> file..."
+      gen.mkfile("foo.txt.tt", foo_txt_tt) 
+      gen.gen("foo.txt", dir+"/foo.txt.tt").should == 0
+      gen.gen("foo.txt", dir+"/foo.txt.tt").should == 1
+      gen.gen("foo.txt", dir+"/foo.txt.tt", :force => true).should == 0
+      File.should be_exists(dir+"/foo.txt")
+      File.open(dir+"/foo.txt").read.should == "This is example file..."
+    end
+  end
+  
+  it "should be able to copy file to given destination" do 
+    within_tmp do |dir|
+      gen = mock_gen
+      foo_txt = "This is example file..."
+      gen.mkfile("files/foo.txt", foo_txt)
+      gen.cp("foo.txt", dir+"/files/foo.txt").should == 0
+      gen.cp("foo.txt", dir+"/files/foo.txt").should == 1
+      gen.cp("foo.txt", dir+"/files/foo.txt", :force => true).should == 0
+      File.should be_exists(dir+"/foo.txt")
+      File.open(dir+"/foo.txt").read.should == "This is example file..."
+    end
+  end
 end
