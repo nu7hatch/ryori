@@ -106,4 +106,18 @@ describe "Ryori generator" do
       File.open(dir+"/bar.txt").read.should == "Hello!"
     end
   end
+  
+  it "should be able to inject content to specified place in file" do 
+    within_tmp do |dir|
+      gen = mock_gen
+      gen.mkfile("foo.txt", "This\nSPARTA!").should == 0
+      gen.inject("foo.txt", "is", :after => /^This/m).should == 0
+      gen.inject("foo.txt", "Foo...", :after => /^foooo/m).should == 1
+      gen.inject("foo.txt", "Yeah!", :before => /^This/m).should == 0
+      gen.inject("bar.txt", "Foo").should == 1
+      File.should be_exists(dir+"/foo.txt")
+      File.should_not be_exists(dir+"/bar.txt")
+      File.open(dir+"/foo.txt").read.should == "Yeah!\nThis\nis\nSPARTA!"
+    end
+  end 
 end

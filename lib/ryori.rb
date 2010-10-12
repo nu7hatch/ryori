@@ -99,8 +99,6 @@ module Ryori
     #   append("orange.txt", "- Whaaaat?!!!")                      # => 0
     #   append("orange.txt", "- ...kkknife...")                    # => 0
     #
-    # will produce:
-    #   
     #   $ cat orange.txt
     #   - Hi! I'm an apple...
     #   - Hey apple! hey apple! hey apple!
@@ -125,8 +123,6 @@ module Ryori
     #   prepend("counting.txt", ".1")   # => 0
     #   prepend("counting.txt", "0")    # => 0
     #
-    # will produce:
-    #
     #   $ cat counting.txt
     #   0
     #   .1
@@ -143,6 +139,39 @@ module Ryori
     end
     alias :prepend_to_file :prepend
     alias :prepend_content :prepend
+    
+    # Insert content to specified place in file. If given file doesn't exist
+    # then nothin will be injected. 
+    #
+    #   mkfile("sparta.txt", "This\nSPARTA!")              # => 0
+    #   inject("sparta.txt", "is", :after => /^this/i)     # => 0
+    #   inject("sparta.txt", "foo", :before => /^foobar/i) # => 1
+    #
+    #   $ cat sparta.txt
+    #   This
+    #   is
+    #   SPARTA!
+    def inject(fname, content=nil, options={})
+      if File.exists?(afname = absolutize(fname))
+        before, after = options.delete(:before), options.delete(:after)
+        orig = File.open(afname, "r").read
+        res = orig.split(/$/)
+        res.each_with_index do |line, id|
+          res[id] = [content, line].join("\n") if before && !after && line =~ before 
+          res[id] = [line, content].join("\n") if after && !before && line =~ after
+        end
+        res = res.join
+        File.open(afname, "w") { |f| f.write(res) }
+        return orig != res ? 0 : 1
+      else
+        return 1
+      end
+    end
+    alias :insert :inject
+    alias :inject_to_file :inject
+    alias :insert_to_file :inject
+    alias :inject_content :inject
+    alias :insert_content :inject
     
     # Returns absolute path to given file. 
     #
