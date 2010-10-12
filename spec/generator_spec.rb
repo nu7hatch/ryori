@@ -78,4 +78,32 @@ describe "Ryori generator" do
       File.open(dir+"/foo.txt").read.should == "This is example file..."
     end
   end
+  
+  it "should be able to append content to file" do 
+    within_tmp do |dir|
+      gen = mock_gen
+      gen.mkfile("foo.txt", "This").should == 0
+      gen.append("foo.txt", "is").should == 0
+      gen.append("foo.txt", "SPARTA!").should == 0
+      gen.append("bar.txt", "Hello!").should == 0
+      File.should be_exists(dir+"/foo.txt")
+      File.should be_exists(dir+"/bar.txt")
+      File.open(dir+"/foo.txt").read.should == "This\nis\nSPARTA!"
+      File.open(dir+"/bar.txt").read.should == "Hello!"
+    end
+  end
+  
+  it "should be able to prepend content to file" do 
+    within_tmp do |dir|
+      gen = mock_gen
+      gen.mkfile("foo.txt", "SPARTA!").should == 0
+      gen.prepend("foo.txt", "is").should == 0
+      gen.prepend("foo.txt", "This").should == 0
+      gen.prepend("bar.txt", "Hello!").should == 0
+      File.should be_exists(dir+"/foo.txt")
+      File.should be_exists(dir+"/bar.txt")
+      File.open(dir+"/foo.txt").read.should == "This\nis\nSPARTA!"
+      File.open(dir+"/bar.txt").read.should == "Hello!"
+    end
+  end
 end

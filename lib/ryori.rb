@@ -91,6 +91,59 @@ module Ryori
     alias :copyfile :cp
     alias :copy_file :cp
     
+    # Add content at the end of given file. If file doesn't exist then it will be
+    # automaticaly created. 
+    # 
+    #   append("orange.txt", "- Hi! I'm an apple...")              # => 0
+    #   append("orange.txt", "- Hey apple! hey apple! hey apple!") # => 0
+    #   append("orange.txt", "- Whaaaat?!!!")                      # => 0
+    #   append("orange.txt", "- ...kkknife...")                    # => 0
+    #
+    # will produce:
+    #   
+    #   $ cat orange.txt
+    #   - Hi! I'm an apple...
+    #   - Hey apple! hey apple! hey apple!
+    #   - Whaaaat?!!!
+    #   - ...kkknife...
+    def append(fname, content=nil, options={})
+      if File.exists?(afname = absolutize(fname))
+        File.open(afname, "a") { |f| f.write("\n#{content}") }
+        return 0
+      else
+        mkfile(fname, content, options)
+      end
+    end
+    alias :append_to_file :append
+    alias :append_content :append
+    
+    # Add content at the begining of given file. If file doesn't exist then it will
+    # be automaticaly created. 
+    #
+    #   prepend("counting.txt", "...3") # => 0
+    #   prepend("counting.txt", "..2")  # => 0
+    #   prepend("counting.txt", ".1")   # => 0
+    #   prepend("counting.txt", "0")    # => 0
+    #
+    # will produce:
+    #
+    #   $ cat counting.txt
+    #   0
+    #   .1
+    #   ..2
+    #   ...3
+    def prepend(fname, content=nil, options={})
+      if File.exists?(afname = absolutize(fname))
+        orig = File.open(afname, "r").read
+        File.open(afname, "w") { |f| f.write("#{content}\n#{orig}") }
+        return 0
+      else
+        mkfile(fname, content, options)
+      end
+    end
+    alias :prepend_to_file :prepend
+    alias :prepend_content :prepend
+    
     # Returns absolute path to given file. 
     #
     #   gen = Ryori::Generator.new("/home/nu7hatch/foo")
