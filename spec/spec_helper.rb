@@ -6,6 +6,16 @@ require 'spec'
 require 'spec/autorun'
 require 'ryori'
 
+module Helpers
+  def within_tmp(&block) 
+    FileUtils.mkdir(fname = File.join(File.dirname(__FILE__), 'tmp'))
+    yield(fname)
+  ensure
+    FileUtils.rm_rf(fname)
+  end
+end
+
 Spec::Runner.configure do |config|
   config.mock_with :mocha
+  config.send :include, Helpers
 end
