@@ -2,17 +2,52 @@ require "fileutils"
 require "erb"
 
 module Ryori
-  class Generator
-  
+  module Helpers
+    # List of available console colors. Each color have it "bold" version. 
+    COLORS = {
+      :black  => 30,
+      :red    => 31,
+      :green  => 32,
+      :yellow => 33,
+      :blue   => 34,
+      :purple => 35,
+      :cyan   => 36,
+      :white  => 37,
+    }
+    
+    # Display colorized output (no new line at the end).
+    def say(text, color=nil, bold=false)
+      print(color ? colorize(text, color, bold) : text) unless ENV["APP_ENV"].to_s == :test
+    end
+    
+    # Display colorized output. 
+    def say!(text, color=nil, bold=false)
+      say(text+"\n")
+    end
+    
+    # Colorize specified text with given color. 
+    def colorize(text, color=:white, bold=false)
+      color = COLORS[color] || COLORS[:white]
+      return "\e[#{bold ? 1 : 0};#{color}m#{text}\e[0m"
+    end
+    alias :c :colorize
+    
+    def adjust(text, size=80, delim=".")
+      spaces = size-text.size
+      spaces > 0 ? text+" "+(c(delim, :black)*spaces) : text 
+    end
+    alias :a :adjust
+  end # Helpers
+
+  class RawGenerator
     # Project root directory.
     attr_reader :root
-    
-    # Generator global settings. 
+    # RawGenerator global settings. 
     attr_reader :options
   
     # Examples:
     #
-    #   gen = Ryori::Generator.new("/path/to/project/root")
+    #   gen = Ryori::RawGenerator.new("/path/to/project/root")
     #   gen.mkfile(".foo/config", "# This is configuration file")
     #   gen.mkdir(".foo/database")
     #   ...
@@ -37,8 +72,8 @@ module Ryori
     #   mkfile("foo/bar.sh", "Foo!", :force => true)                          # => 0
     def mkfile(fname, content="", options={})
       mkdir(File.dirname(fname)) and begin
-        if File.exists?(absolutize(fname)) && !options.delete(:force)
-          return 1
+        if File.exists?(aname = absolutize(fname)) && !options.delete(:force)
+          return File.open(aname).read == content ? 2 : 1
         else
           File.open(absolutize(fname), "w+") {|f| f.write(content)} and \
           touch(fname, options) and \
@@ -175,10 +210,101 @@ module Ryori
     
     # Returns absolute path to given file. 
     #
-    #   gen = Ryori::Generator.new("/home/nu7hatch/foo")
+    #   gen = Ryori::RawGenerator.new("/home/nu7hatch/foo")
     #   gen.absolutize("bar/bla") # => "/home/nu7hatch/foo/bar/bla"
     def absolutize(fname)
       File.join(root, fname)
+    end
+  end # RawGenerator
+  
+  class Generator < RawGenerator
+    include Helpers
+    
+    # This backlog can be used eg. for test purpose. It keeps all operations
+    # made in current instance of generator. The log format looks like this: 
+    #
+    #   [
+    #     [:created, "/home/foo/bar.rb"],
+    #     [:created, "/home/foo/bar/spam.rb"],
+    #     [:identical, "/home/foo/bar/eggs.rb"],
+    #     [:exist, "/home/foo/bar/bla.rb"],
+    #     [:override, "/home/foo/bar/bla.rb"]
+    #   ]
+    def backlog
+      @backlog ||= []
+    end
+    
+    # Store given operation on file in log and say about it on stdout. 
+    def log(operation, name, color=nil, bold=false)
+      say!(c(a(operation, 20), color, bold) + " " + name)
+      backlog << [operation.gsub(/\W/, "_").to_sym, absolutize(name)]
+    end
+    
+    # It displays help message for conflicting files. 
+    def help
+      say! "y - yes, overwrite it"
+      say! "n - no, don't overwrite it"
+      say! "a - overwrite this and all others"
+      say! "q - abort and quit"
+      say! "h - show this help message"
+    end
+    
+    # See RawGenerator#touch instance method...
+    def touch(fname, options={})
+      verbose = options.delete(:verbose) 
+      result = super(fname, options)
+      if verbose 
+        result == 0 ?
+          log("touched", fname, :green, true) :
+          log("not touched", fname, :red, true)
+      end
+      return result
+    end
+    
+    # See RawGenerator#mkdir instance method...
+    def mkdir(dirname, options={})
+      verbose = options.delete(:verbose) 
+      result = super(dirname, options)
+      if verbose
+        result == 0 ?
+          log("created", dirname, :green, true) :
+          log("exist", dirname, :blue, true)
+      end
+      return result
+    end
+    
+    # See RawGenerator#mkfile instance method...
+    def mkfile(fname, content="", options={})
+      verbose = options.delete(:verbose) 
+      result = super(fname, content, options)
+      if verbose 
+        case result
+        when 0 then log("created", fname, :green, true)
+        when 2 then log("identical", fname, :blue, true)
+        else
+          log("exist", fname, :yellow, true) unless @yes_to_all
+          while true
+            decision = unless @yes_to_all
+              say("Overwrite #{absolutize(fname)} file? (enter \"h\" for help) [Ynaqh]: ", :yellow)
+              gets.chomp.downcase
+            end
+            @yes_to_all = true if decision == "a"
+            @yes_to_all and decision = "y"
+            case decision 
+            when "n" then return 1
+            when "h" then help
+            when "q" then exit(0)
+            when "", "y"
+              result = super(fname, content, options.merge(:force => true))
+              result == 0 ?
+                log("overwritten", fname, :blue, true) :
+                log("not overwritten", fname, :red, true)
+              return result
+            end
+          end
+        end
+      end
+      return result
     end
   end # Generator
 end # Ryori

@@ -2,16 +2,16 @@ require "spec_helper"
 
 describe "Ryori generator" do 
   def mock_gen
-    Ryori::Generator.new(File.dirname(__FILE__)+"/tmp")
+    Ryori::RawGenerator.new(File.dirname(__FILE__)+"/tmp")
   end
   
   it "should properly set root dir on initialize" do 
-    gen = Ryori::Generator.new(Dir.pwd)
+    gen = Ryori::RawGenerator.new(Dir.pwd)
     gen.root.should == Dir.pwd
   end
   
   it "should properly set args on initialize" do 
-    gen = Ryori::Generator.new(Dir.pwd, :foo => :bar)
+    gen = Ryori::RawGenerator.new(Dir.pwd, :foo => :bar)
     gen.options.should == {:foo => :bar}
   end
   
@@ -48,6 +48,7 @@ describe "Ryori generator" do
       gen.mkfile("foo/bar.sh", "foobar!").should == 0
       gen.mkfile("foo/bar.sh", "woop!").should == 1
       gen.mkfile("foo/bar.sh", "woop!", :force => true).should == 0
+      gen.mkfile("foo/bar.sh", "woop!").should == 2
       File.should be_exists(dir+"/foo.txt")
       File.should be_exists(dir+"/foo/bar.sh")
     end
@@ -59,7 +60,7 @@ describe "Ryori generator" do
       foo_txt_tt = "This is <%= 'example' %> file..."
       gen.mkfile("foo.txt.tt", foo_txt_tt) 
       gen.gen("foo.txt", dir+"/foo.txt.tt").should == 0
-      gen.gen("foo.txt", dir+"/foo.txt.tt").should == 1
+      gen.gen("foo.txt", dir+"/foo.txt.tt").should == 2
       gen.gen("foo.txt", dir+"/foo.txt.tt", :force => true).should == 0
       File.should be_exists(dir+"/foo.txt")
       File.open(dir+"/foo.txt").read.should == "This is example file..."
