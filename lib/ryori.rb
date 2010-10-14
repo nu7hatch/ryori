@@ -17,12 +17,12 @@ module Ryori
     
     # Display colorized output (no new line at the end).
     def say(text, color=nil, bold=false)
-      print(color ? colorize(text, color, bold) : text) unless ENV["APP_ENV"].to_s == :test
+      print(color ? colorize(text, color, bold) : text)
     end
     
     # Display colorized output. 
     def say!(text, color=nil, bold=false)
-      say(text+"\n")
+      say(text+"\n", color, bold)
     end
     
     # Colorize specified text with given color. 
@@ -32,12 +32,25 @@ module Ryori
     end
     alias :c :colorize
     
+    # Display given text adjusted to the desired length.
+    #
+    #   adjust("This", 30, "-")
+    #   adjust("is", 30, "-")
+    #   adjust("SPARTA!", 30, "-")
+    #
+    # will produce:
+    #
+    #   This -------------------------
+    #   is ---------------------------
+    #   SPARTA -----------------------
     def adjust(text, size=80, delim=".")
-      spaces = size-text.size
-      spaces > 0 ? text+" "+(c(delim, :black)*spaces) : text 
+      delims = size-text.size
+      delims > 0 ? text+" "+(c(delim*(delims-1), :black)) : text 
     end
     alias :a :adjust
   end # Helpers
+
+  extend Helpers
 
   class RawGenerator
     # Project root directory.
