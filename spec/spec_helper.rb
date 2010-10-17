@@ -2,33 +2,59 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 
 require 'rubygems'
-require 'spec'
-require 'spec/autorun'
-require 'ryori'
 require 'stringio'
+require 'ostruct'
+require 'rspec'
+require 'mocha'
+
+require 'ryori'
 
 module Helpers
-  def within_tmp(&block) 
-    FileUtils.mkdir(fname = File.join(File.dirname(__FILE__), 'tmp'))
-    yield(fname)
-  ensure
-    FileUtils.rm_rf(fname)
-  end
-
-  def capture(*streams)
-    streams.map! { |stream| stream.to_s }
+  # Capture and silence output streams (stdout, stderr), and return it values.
+  #
+  #   capture { puts "This is sparta!" }
+  #   last_stdout # => "This is sparta!"
+  #   last_stderr # => ""   
+  def capture
+    @last_stdout = StringIO.new
+    @last_stderr = StringIO.new
     begin
-      result = StringIO.new
-      streams.each { |stream| eval "$#{stream} = result" }
+      $stdout = @last_stdout
+      $stderr = @last_stderr
       yield
     ensure
-      streams.each { |stream| eval("$#{stream} = #{stream.upcase}") }
+      $stdout = STDERR
+      $stderr = STDOUT
     end
-    result.string
+    [@last_stdout.string, @last_stderr.string]
+  end
+
+  # Returns last string written to captured output stream.
+  def last_stdout
+    @last_stdout.string if @last_stdout
+  end
+  
+  # Returns last string written to captured error stream.
+  def last_stderr
+    @last_stdout.string if @last_stdout
+  end
+
+  # Executes code within given temp directory context. 
+  def within_tmp(&block) 
+    FileUtils.mkdir(dirname = File.join(File.dirname(__FILE__), 'tmp'))
+    yield(dirname)
+  ensure
+    FileUtils.rm_rf(dirname)
+  end
+  
+  # Returns mock generator. 
+  def mock_gen(opts={})
+    subject.new(File.dirname(__FILE__)+"/tmp", opts)
   end
 end
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config| 
   config.mock_with :mocha
-  config.send :include, Helpers
+  config.include Helpers
 end
+

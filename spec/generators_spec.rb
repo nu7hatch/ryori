@@ -1,17 +1,13 @@
 require "spec_helper"
 
-describe "Ryori generator" do 
-  def mock_gen
-    Ryori::RawGenerator.new(File.dirname(__FILE__)+"/tmp")
-  end
-  
+GENERATOR_COMMON_SPECS = proc do 
   it "should properly set root dir on initialize" do 
-    gen = Ryori::RawGenerator.new(Dir.pwd)
+    gen = subject.new(Dir.pwd)
     gen.root.should == Dir.pwd
   end
   
   it "should properly set args on initialize" do 
-    gen = Ryori::RawGenerator.new(Dir.pwd, :foo => :bar)
+    gen = subject.new(Dir.pwd, :foo => :bar)
     gen.options.should == {:foo => :bar}
   end
   
@@ -121,4 +117,36 @@ describe "Ryori generator" do
       File.open(dir+"/foo.txt").read.should == "Yeah!\nThis\nis\nSPARTA!"
     end
   end 
+end
+
+describe "Ryori raw generator" do 
+  subject { Ryori::RawGenerator }
+  instance_eval(&GENERATOR_COMMON_SPECS)
+end
+
+describe "Ryori generator" do
+  subject { Ryori::Generator }
+  instance_eval(&GENERATOR_COMMON_SPECS)
+  
+  it "should properly store all operations in backlog" do 
+    gen = mock_gen
+    gen.expects(:say!).once
+    gen.log(:create, "foo/bar.rb")
+    gen.backlog.should == [[:create, File.join(File.dirname(__FILE__), "tmp/foo/bar.rb")]] 
+  end
+  
+  it "should properly resolve verbosity" do 
+    gen = mock_gen
+    gen.verbose?.should be_false
+    gen.verbose?(:verbose => true).should be_true
+    gen = mock_gen(:verbose => true)
+    gen.verbose?.should be_true
+    gen.verbose?(:verbose => false).should be_false
+  end
+  
+  it "should properly display help for conflicting files" do 
+    capture { mock_gen.help }
+    last_stdout.should == "y - yes, overwrite it\nn - no, don't overwrite it\na - " + \
+      "overwrite this and all others\nq - abort and quit\nh - show this help message\n"
+  end
 end

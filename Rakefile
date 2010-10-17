@@ -1,19 +1,16 @@
 require 'rubygems'
 require 'rake'
 
-require 'spec/rake/spectask'
-Spec::Rake::SpecTask.new(:spec) do |spec|
-  spec.libs << 'lib' << 'spec'
-  spec.spec_files = FileList['spec/**/*_spec.rb']
-  spec.spec_opts = %w[--colour --backtrace]
+require 'rspec/core/rake_task'
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.pattern = 'spec/**/*_spec.rb'
+  t.rspec_opts = %q[--colour --backtrace]
 end
 
-Spec::Rake::SpecTask.new(:rcov) do |spec|
-  spec.libs << 'lib' << 'spec'
-  spec.pattern = 'spec/**/*_spec.rb'
-  spec.rcov = true
-  spec.rcov_opts = %w[--text-report]
-  spec.spec_opts = %w[--colour --backtrace]
+RSpec::Core::RakeTask.new(:rcov) do |t|
+  t.rcov = true
+  t.rspec_opts = %q[--colour --backtrace]
+  t.rcov_opts = %q[--exclude "spec" --text-report]
 end
 
 task :default => :spec
