@@ -5,7 +5,7 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "ryori"
-    gem.summary = %Q{Easy to use, extensible generator and recipes compiler. }
+    gem.summary = %Q{Projects generator and recipes compiler.}
     gem.description = <<-DESCR
       TODO...
     DESCR
