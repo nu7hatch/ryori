@@ -54,7 +54,7 @@ module Helpers
   # Executes code within given temp directory context. 
   def within_tmp(&block) 
     FileUtils.mkdir(dirname = File.join(File.dirname(__FILE__), 'tmp'))
-    yield(dirname)
+    yield(File.expand_path(dirname))
   ensure
     FileUtils.rm_rf(dirname)
   end

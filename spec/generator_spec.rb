@@ -13,9 +13,11 @@ describe "Ryori generator" do
     gen.options.should == {:foo => :bar}
   end
   
-  it "#absolutize should return an absolute path from given one" do 
-    gen = mock_gen
-    gen.absolutize("foo/bar/bla").should == File.dirname(__FILE__)+"/tmp/foo/bar/bla"
+  it "#absolute_path should return an absolute path for given one" do 
+    within_tmp do |dir|
+      gen = mock_gen
+      gen.absolute_path("foo/bar/bla").should == "#{dir}/foo/bar/bla"
+    end
   end
   
   it "should be able to touch empty file" do 
@@ -124,10 +126,12 @@ describe "Ryori generator" do
   end 
 
   it "should properly store all operations in backlog" do 
-    gen = mock_gen
-    gen.expects(:say!).once
-    gen.log(:create, "foo/bar.rb")
-    gen.backlog.should == [[:create, File.join(File.dirname(__FILE__), "tmp/foo/bar.rb")]] 
+    within_tmp do |dir|
+      gen = mock_gen
+      gen.expects(:say!).once
+      gen.log(:create, "foo/bar.rb")
+      gen.backlog.should == [[:create, "#{dir}/foo/bar.rb"]]
+    end 
   end
   
   it "should properly display help for conflicting files" do 
@@ -143,7 +147,7 @@ describe "Ryori generator" do
           decision = mock_gen.conflict_prompt("foo.rb")
           decision.should == "n"
         end
-        last_stdout.should == "\e[0;33mThe ./spec/tmp/foo.rb exists, overwrite it? (enter "+
+        last_stdout.should == "\e[0;33mThe #{dir}/foo.rb exists, overwrite it? (enter "+
           "\"h\" for help) [Ynaqh]: \e[0m"
       end
     end
@@ -203,7 +207,7 @@ describe "Ryori generator" do
       fake_stdin("y") do
         capture { mock_gen.mkfile("foo.txt", "Yada yada yada!") }
         last_stdout.should == "\e[1;33mexist \e[0;30m..............\e[0m\e[0m foo.txt"+
-          "\n\e[0;33mThe ./spec/tmp/foo.txt exists, overwrite it? (enter \"h\" for help) [Ynaqh]: "+
+          "\n\e[0;33mThe #{dir}/foo.txt exists, overwrite it? (enter \"h\" for help) [Ynaqh]: "+
           "\e[0m\e[1;34moverwritten \e[0;30m........\e[0m\e[0m foo.txt\n"
       end
     end
@@ -222,7 +226,7 @@ describe "Ryori generator" do
       fake_stdin("y") do
         capture { mock_gen.cp(dir+"/files/bar.txt", "foo.txt") }
         last_stdout.should == "\e[1;33mexist \e[0;30m..............\e[0m\e[0m foo.txt"+
-          "\n\e[0;33mThe ./spec/tmp/foo.txt exists, overwrite it? (enter \"h\" for help) [Ynaqh]: "+
+          "\n\e[0;33mThe #{dir}/foo.txt exists, overwrite it? (enter \"h\" for help) [Ynaqh]: "+
           "\e[0m\e[1;34moverwritten \e[0;30m........\e[0m\e[0m foo.txt\n"
       end
     end
@@ -271,7 +275,7 @@ describe "Ryori generator" do
       fake_stdin("y") do
         capture { mock_gen.compile(dir+"/bar.txt.tt", "foo.txt") }
         last_stdout.should == "\e[1;33mexist \e[0;30m..............\e[0m\e[0m foo.txt"+
-          "\n\e[0;33mThe ./spec/tmp/foo.txt exists, overwrite it? (enter \"h\" for help) [Ynaqh]: "+
+          "\n\e[0;33mThe #{dir}/foo.txt exists, overwrite it? (enter \"h\" for help) [Ynaqh]: "+
           "\e[0m\e[1;34moverwritten \e[0;30m........\e[0m\e[0m foo.txt\n"
       end
     end

@@ -177,7 +177,7 @@ module Ryori
     # Displays prompt when specified file already exists. 
     def conflict_prompt(fname)
       unless yes_to_all?
-        say("The #{absolutize(fname)} exists, overwrite it? (enter \"h\" for help) [Ynaqh]: ", :yellow)
+        say("The #{absolute_path(fname)} exists, overwrite it? (enter \"h\" for help) [Ynaqh]: ", :yellow)
         $stdin.gets.to_s.chomp.downcase
       end
     end
@@ -198,9 +198,9 @@ module Ryori
     # Returns absolute path to given file. 
     #
     #   gen = Ryori::RawGenerator.new("/home/nu7hatch/foo")
-    #   gen.absolutize("bar/bla") # => "/home/nu7hatch/foo/bar/bla"
-    def absolutize(fname)
-      File.join(root, fname)
+    #   gen.absolute_path("bar/bla") # => "/home/nu7hatch/foo/bar/bla"
+    def absolute_path(fname)
+      File.expand_path(File.join(root, fname))
     end
     
     # This backlog can be used eg. for test purpose. It keeps all operations
@@ -220,7 +220,7 @@ module Ryori
     # Store given operation on file in log and say about it on stdout. 
     def log(operation, name, color=nil, bold=false)
       say!(c(a(operation.to_s, 20), color, bold) + " " + name)
-      backlog << [operation.to_s.gsub(/\W/, "_").to_sym, absolutize(name)]
+      backlog << [operation.to_s.gsub(/\W/, "_").to_sym, absolute_path(name)]
       nil
     end
     
@@ -235,15 +235,15 @@ module Ryori
     end
     
     def raw_touch(fname, options={})
-      raw_mkdir(File.dirname(fname)) and FileUtils.touch(absolutize(fname), options) and 0
+      raw_mkdir(File.dirname(fname)) and FileUtils.touch(absolute_path(fname), options) and 0
     end
     
     def raw_mkfile(fname, content="", options={})
       raw_mkdir(File.dirname(fname)) and begin
-        if File.exists?(aname = absolutize(fname)) && !options.delete(:force)
+        if File.exists?(aname = absolute_path(fname)) && !options.delete(:force)
           return File.open(aname).read == content ? 2 : 1
         else
-          File.open(absolutize(fname), "w+") {|f| f.write(content)} and \
+          File.open(absolute_path(fname), "w+") {|f| f.write(content)} and \
           raw_touch(fname, options) and \
           return 0
         end
@@ -251,7 +251,7 @@ module Ryori
     end
     
     def raw_mkdir(dirname, options={})
-      File.exists?(dirname = absolutize(dirname)) ? 1 : (FileUtils.mkdir_p(dirname) and 0)
+      File.exists?(dirname = absolute_path(dirname)) ? 1 : (FileUtils.mkdir_p(dirname) and 0)
     end
     
     def raw_compile(src, dest, options={})
@@ -260,16 +260,16 @@ module Ryori
 
     def raw_cp(src, dest, options={})
       raw_mkdir(File.dirname(dest)) and begin
-        if File.exists?(absolutize(dest)) && !options.delete(:force)
-          return File.open(src).read ==  File.open(absolutize(dest)).read ? 2 : 1
+        if File.exists?(absolute_path(dest)) && !options.delete(:force)
+          return File.open(src).read ==  File.open(absolute_path(dest)).read ? 2 : 1
         else
-          FileUtils.cp(src, absolutize(dest)).nil? and raw_touch(dest, options) and return 0
+          FileUtils.cp(src, absolute_path(dest)).nil? and raw_touch(dest, options) and return 0
         end
       end
     end
     
     def raw_append(fname, content=nil, options={})
-      if File.exists?(afname = absolutize(fname))
+      if File.exists?(afname = absolute_path(fname))
         File.open(afname, "a") { |f| f.write("\n#{content}") }
         return 0
       else
@@ -279,7 +279,7 @@ module Ryori
     end
     
     def raw_prepend(fname, content=nil, options={})
-      if File.exists?(afname = absolutize(fname))
+      if File.exists?(afname = absolute_path(fname))
         orig = File.open(afname, "r").read
         File.open(afname, "w") { |f| f.write("#{content}\n#{orig}") }
         return 0
@@ -290,7 +290,7 @@ module Ryori
     end
     
     def raw_inject(fname, content=nil, options={})
-      if File.exists?(afname = absolutize(fname))
+      if File.exists?(afname = absolute_path(fname))
         before, after = options.delete(:before), options.delete(:after)
         orig = File.open(afname, "r").read
         res = orig.split(/$/)
