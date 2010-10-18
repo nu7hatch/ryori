@@ -28,6 +28,18 @@ module Helpers
     end
     [@last_stdout.string, @last_stderr.string]
   end
+  
+  # Replace standard input with faked one StringIO. 
+  def fake_stdin(text)
+    begin
+      $stdin = StringIO.new
+      $stdin.puts(text)
+      $stdin.rewind
+      yield
+    ensure
+      $stdin = STDIN
+    end
+  end 
 
   # Returns last string written to captured output stream.
   def last_stdout
@@ -49,7 +61,7 @@ module Helpers
   
   # Returns mock generator. 
   def mock_gen(opts={})
-    subject.new(File.dirname(__FILE__)+"/tmp", opts)
+    Ryori::Generator.new(File.dirname(__FILE__)+"/tmp", opts)
   end
 end
 

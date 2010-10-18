@@ -3,8 +3,7 @@ require "erb"
 
 module Ryori
   autoload :Helpers,      "ryori/helpers"
-  autoload :RawGenerator, "ryori/generators"
-  autoload :Generator,    "ryori/generators"
+  autoload :Generator,    "ryori/generator"
 
   extend Helpers
 end # Ryori
