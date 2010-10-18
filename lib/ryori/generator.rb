@@ -1,7 +1,8 @@
 module Ryori
+
   # Ryori Generator can help you with creating, copying and manipulating files, 
   # creating directories, and compile templates. In brief, it can help you 
-  # in creating projects structure.    
+  # eg. with creating structure of your projects or preparing recipes.
   #  
   # ==== Examples
   #
