@@ -42,10 +42,10 @@ describe Ryori::Makers::Base do
     end
   end
   
-  describe ".status" do
+  describe ".attr_status" do
     before do
       klass = Class.new(subject)
-      klass.status :testing
+      klass.attr_status :testing
       @test = klass.new
     end
     
@@ -61,7 +61,7 @@ describe Ryori::Makers::Base do
   describe "shortcuts created by .status" do
     before do
       klass = Class.new(subject)
-      klass.status :testing
+      klass.attr_status :testing
       @test = klass.new
     end
     

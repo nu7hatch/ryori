@@ -10,10 +10,14 @@ module Ryori
       
       # Creates shortcuts for given statuses:
       #
+      #   attr_status :my_status
+      #
+      # will produce methods:
+      #
       #   my_status! # => status!(:my_status)
       #   my_status? # => status?(:my_status)
       #
-      def self.status(*statuses)
+      def self.attr_status(*statuses)
         statuses.each do |status|
           define_method("#{status}!".to_sym) { status!(status.to_sym) }
           define_method("#{status}?".to_sym) { status?(status.to_sym) }
@@ -23,7 +27,7 @@ module Ryori
       
       # Shortcuts for the most commonly used statuses. We are creating 
       # <tt>success</tt> and <tt>error</tt> shortcuts by default. 
-      status :success, :error
+      attr_status :success, :error
       
       # Returns status of currently performed operation. 
       def status

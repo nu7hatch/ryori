@@ -2,8 +2,8 @@ module Ryori
   module Makers
     class Dirmaker < Base
     
-      attr_reader :dirname
-      attr_reader :chmod
+      attr_reader :dirname, :chmod
+      attr_status :exist
     
       def initialize(dirname, chmod=644)
         @dirname = dirname
