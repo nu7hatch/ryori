@@ -9,6 +9,64 @@ describe Ryori::Makers::Base do
     Ryori::Makers::Base
   end
   
+  describe ".all_forced?" do
+    it "should return false by default" do
+      subject.should_not be_all_forced
+    end
+  end
+  
+  describe ".force_all!" do
+    it "should set force mode for all makers" do
+      subject.force_all!
+      subject.should be_all_forced
+    end
+    
+    after do
+      subject.send(:class_variable_set, "@@force_all", false)
+    end
+  end
+  
+  describe "#force!" do
+    it "should set force mode for current action" do
+      base = subject.new
+      base.force!
+      base.instance_variable_get("@force").should == true
+    end
+  end
+  
+  describe "#force?" do
+    context "when local force mode is enabled" do
+      context "and global disabled" do
+        it "should return true" do
+          base = subject.new
+          base.force!
+          base.should be_forced
+        end
+      end
+    end
+    
+    context "when local force mode is disabled" do
+      context "and global disabled" do
+        it "should return false" do
+          base = subject.new
+          base.should_not be_forced
+        end
+      end
+      
+      context "and global enabled" do
+        it "should return true" do
+          base = subject.new
+          base.force_all!
+          base.should be_forced
+        end
+      end
+      
+      after do
+        subject.send(:class_variable_set, "@@force_all", false)
+      end
+    end
+  end
+  
   describe "#status" do
     it "should be nil by default" do
       subject.new.status.should == nil

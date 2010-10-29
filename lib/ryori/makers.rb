@@ -6,8 +6,18 @@ module Ryori
     autoload :FileUpdater, "ryori/makers/fileupdater"
     
     class Base
-      
+
       include Helpers
+
+      # Should all actions be performed in force mode?
+      def self.all_forced?
+        defined?(@@force_all) and !!@@force_all
+      end
+      
+      # Set force mode for all apps. 
+      def self.force_all!
+        @@force_all = true
+      end
       
       # Creates shortcuts for given statuses:
       #
@@ -43,6 +53,21 @@ module Ryori
       #
       def status?(status)
         self.status == status.to_sym
+      end
+      
+      # Should be forced performing of current action?
+      def forced?
+        @force || self.class.all_forced?
+      end
+      
+      # See Ryori::Makers::Base.force_all! for details.
+      def force_all!
+        self.class.force_all!
+      end
+      
+      # Set force mode for current action.
+      def force!
+        @force = true
       end
       
       protected

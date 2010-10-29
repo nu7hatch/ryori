@@ -33,6 +33,7 @@ describe Ryori::Helpers do
   describe "#console_width" do
     it "should return actual console width" do
       # tested manualy...
+      subject.console_width
     end
   end
   

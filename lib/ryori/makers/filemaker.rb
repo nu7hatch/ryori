@@ -9,7 +9,8 @@ module Ryori
         @filename  = filename
         @content   = content 
         @chmod     = options[:mode] || 644
-        @force     = options[:force]
+        
+        force! if options[:force]
       end
     
       def perform!
@@ -35,11 +36,6 @@ module Ryori
       # content as given in initializer.  
       def identical_content?
         File.read(filename) == content
-      end
-      
-      # Should be forced performing of current action?
-      def forced?
-        !!@force
       end
       
     end # Filemaker

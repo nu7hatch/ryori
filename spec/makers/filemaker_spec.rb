@@ -27,7 +27,7 @@ describe Ryori::Makers::FileMaker do
     end
     
     context "given :force option" do
-      it "should set it" do
+      it "should run in force mode" do
         subject.new("/path/to/file", nil, :force => true).should be_forced
       end
     end

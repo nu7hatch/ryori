@@ -9,9 +9,10 @@ module Ryori
         @filename  = filename
         @content   = content 
         @chmod     = options[:mode] || 644
-        @force     = options[:force]
         @before    = options[:before]
         @after     = options[:after]
+        
+        force! if options[:force]
       end
     
       def perform!
