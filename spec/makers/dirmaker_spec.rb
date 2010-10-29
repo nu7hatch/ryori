@@ -14,9 +14,9 @@ describe Ryori::Makers::Dirmaker do
       subject.new("/path/to/dir").chmod.should == 644
     end
     
-    context "when chmod given" do
-      it "should set it in instance" do
-        subject.new("/path/to/dir", 755).chmod.should == 755
+    context "given :mode" do
+      it "should set it" do
+        subject.new("/path/to/dir", :mode => 755).chmod.should == 755
       end
     end
   end
@@ -60,7 +60,7 @@ describe Ryori::Makers::Dirmaker do
       end
     end
     
-    context "when directory has not been created" do
+    context "when directory can't been created" do
       it "shouldn't create it and set :error status" do
         FileUtils.expects(:mkdir_p).with("/path/to/dir", :mode => 644).returns(false)
         subject.perform!.should == :error

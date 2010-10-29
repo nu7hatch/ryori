@@ -2,7 +2,7 @@ module Ryori
   module Makers
   
     autoload :Dirmaker,  "ryori/makers/dirmaker"
-    #autoload :Filemaker, "ryori/makers/filemaker"
+    autoload :Filemaker, "ryori/makers/filemaker"
     
     class Base
       

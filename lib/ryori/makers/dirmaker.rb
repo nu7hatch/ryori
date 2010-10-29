@@ -5,9 +5,9 @@ module Ryori
       attr_reader :dirname, :chmod
       attr_status :created, :exist, :noaccess
     
-      def initialize(dirname, chmod=644)
+      def initialize(dirname, options={})
         @dirname = dirname
-        @chmod   = chmod
+        @chmod   = options[:mode] || 644
       end
     
       def perform!
