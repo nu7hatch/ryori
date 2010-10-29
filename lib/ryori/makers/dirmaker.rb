@@ -3,7 +3,7 @@ module Ryori
     class Dirmaker < Base
     
       attr_reader :dirname, :chmod
-      attr_status :exist
+      attr_status :created, :exist, :noaccess
     
       def initialize(dirname, chmod=644)
         @dirname = dirname
@@ -11,7 +11,13 @@ module Ryori
       end
     
       def perform!
-        
+        return exist!   if File.exist?(dirname)
+        return created! if FileUtils.mkdir_p(dirname, :mode => chmod) == dirname
+        error!
+      rescue Errno::EACCES
+        noaccess!
+      rescue Object
+        error!
       end
       
     end # Dirmaker
