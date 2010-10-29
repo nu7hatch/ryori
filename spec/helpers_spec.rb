@@ -1,7 +1,20 @@
-require "spec_helper"
+require File.expand_path("../spec_helper", __FILE__)
 
-describe "Ryori helpers" do
-  subject { Ryori }
+describe Ryori::Helpers do
+  subject do
+    Ryori
+  end
+  
+  context "#say!" do
+    Ryori::Helpers::COLORS.each do |color, code|
+      [false, true].each do |bold|
+        it "should properly display #{bold ? "bold and" : ""}#{color.to_s} text on screen" do 
+          capture { Ryori.say!(color.to_s, color, bold) }
+          last_stdout.should == "\e[#{bold ? 1 : 0};#{code}m#{color.to_s}\n\e[0m"
+        end
+      end
+    end
+  end
   
   describe "#print" do
     it "should properly print given text to stdout" do
@@ -38,16 +51,4 @@ describe "Ryori helpers" do
       end
     end
   end
-  
-  context "#say!" do
-    Ryori::Helpers::COLORS.each {|color, code|
-      [false, true].each {|bold|
-        it "should properly display #{bold ? "bold and" : ""}#{color.to_s} text on screen" do 
-          capture { Ryori.say!(color.to_s, color, bold) }
-          last_stdout.should == "\e[#{bold ? 1 : 0};#{code}m#{color.to_s}\n\e[0m"
-        end
-      }
-    }
-  end
-  
 end
