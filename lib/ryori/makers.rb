@@ -1,8 +1,9 @@
 module Ryori
   module Makers
   
-    autoload :Dirmaker,  "ryori/makers/dirmaker"
-    autoload :Filemaker, "ryori/makers/filemaker"
+    autoload :DirMaker,    "ryori/makers/dirmaker"
+    autoload :FileMaker,   "ryori/makers/filemaker"
+    autoload :FileUpdater, "ryori/makers/fileupdater"
     
     class Base
       

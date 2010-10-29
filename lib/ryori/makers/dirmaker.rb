@@ -1,6 +1,6 @@
 module Ryori
   module Makers
-    class Dirmaker < Base
+    class DirMaker < Base
     
       attr_reader :dirname, :chmod
       attr_status :created, :exist, :noaccess

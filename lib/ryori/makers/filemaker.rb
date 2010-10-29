@@ -1,9 +1,9 @@
 module Ryori
   module Makers
-    class Filemaker < Base
+    class FileMaker < Base
     
       attr_reader :filename, :chmod, :content
-      attr_status :created, :noaccess, :identical, :conflict, :overwritten
+      attr_status :created, :noaccess, :identical, :conflict, :updated
     
       def initialize(filename, content=nil, options={})
         @filename  = filename
@@ -17,7 +17,7 @@ module Ryori
           return identical! if identical_content?
           return status     if conflict! and !forced?
         end
-        return conflict? ? overwritten! : created! if create_file!
+        return conflict? ? updated! : created! if create_file!
         error!
       rescue Errno::EACCES
         noaccess!
