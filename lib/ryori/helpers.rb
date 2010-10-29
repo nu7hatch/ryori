@@ -1,7 +1,6 @@
 module Ryori
-  # Common helpers used in various places by Ryori components... 
   module Helpers
-    # List of available console colors. Each color have its "bold" version. 
+  
     COLORS = {
       :black  => 30,
       :red    => 31,
@@ -18,7 +17,7 @@ module Ryori
       print(color ? colorize(text, color, bold) : text)
     end
     
-    # Writes given text to <tt>$stdout</tt>
+    # Writes given text to <tt>$stdout</tt>.
     def print(*args)
       res = $stdout.write(*args)
       $stdout.flush
@@ -48,10 +47,17 @@ module Ryori
     #   This -------------------------
     #   is ---------------------------
     #   SPARTA! ----------------------
-    def adjust(text, size=80, delim=".")
+    def adjust(text, size=nil, delim=".")
+      size ||= console_width
       delims = size-text.size
       delims > 0 ? text+" "+(c(delim*(delims-1), :black)) : text 
     end
     alias :a :adjust
+    
+    # Returns actual width of console line. 
+    def console_width
+      `stty size`.split.last.to_i
+    end
+    
   end # Helpers
 end # Ryori
