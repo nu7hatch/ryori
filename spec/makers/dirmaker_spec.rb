@@ -21,7 +21,7 @@ describe Ryori::Makers::DirMaker do
     end
   end
   
-  describe "#perform!" do
+  describe "#perform" do
     subject do
       Ryori::Makers::DirMaker.new("/path/to/dir")
     end
@@ -29,8 +29,9 @@ describe Ryori::Makers::DirMaker do
     context "when given directory exists" do
       it "should set :exist status" do
         File.expects(:exist?).returns(true)
-        subject.perform!.should == :exist
-        subject.should be_exist
+        maker = subject
+        maker.perform.should == :exist
+        maker.should be_exist
       end
     end
     
@@ -38,16 +39,18 @@ describe Ryori::Makers::DirMaker do
       context "and user have access to create it" do
         it "should set :created status" do
           FileUtils.expects(:mkdir_p).with("/path/to/dir", :mode => 644).returns("/path/to/dir")
-          subject.perform!.should == :created
-          subject.should be_created
+          maker = subject
+          maker.perform.should == :created
+          maker.should be_created
         end
       end
       
       context "and user don't have access to create it" do
         it "should set :noaccess status" do
           FileUtils.expects(:mkdir_p).with("/path/to/dir", :mode => 644).raises(Errno::EACCES)
-          subject.perform!.should == :noaccess
-          subject.should be_noaccess
+          maker = subject
+          maker.perform.should == :noaccess
+          maker.should be_noaccess
         end
       end
     end
@@ -55,16 +58,18 @@ describe Ryori::Makers::DirMaker do
     context "when unknown error raised while creating directory" do
       it "shouldn't create it and set :noaccess status" do
         FileUtils.expects(:mkdir_p).with("/path/to/dir", :mode => 644).raises(Exception)
-        subject.perform!.should == :error
-        subject.should be_error
+        maker = subject
+        maker.perform.should == :error
+        maker.should be_error
       end
     end
     
     context "when directory can't been created" do
       it "shouldn't create it and set :error status" do
         FileUtils.expects(:mkdir_p).with("/path/to/dir", :mode => 644).returns(false)
-        subject.perform!.should == :error
-        subject.should be_error
+        maker = subject
+        maker.perform.should == :error
+        maker.should be_error
       end
     end
   end

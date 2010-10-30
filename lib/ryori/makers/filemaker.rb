@@ -13,7 +13,7 @@ module Ryori
         force! if options[:force]
       end
     
-      def perform!
+      def perform
         if File.exist?(filename)
           return identical! if identical_content?
           return status     if conflict! and !forced?

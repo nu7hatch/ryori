@@ -10,7 +10,7 @@ module Ryori
         @chmod   = options[:mode] || 644
       end
     
-      def perform!
+      def perform
         return exist!   if File.exist?(dirname)
         return created! if FileUtils.mkdir_p(dirname, :mode => chmod) == dirname
         error!

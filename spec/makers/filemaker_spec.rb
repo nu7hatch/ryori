@@ -33,7 +33,7 @@ describe Ryori::Makers::FileMaker do
     end
   end
   
-  describe "#perform!" do
+  describe "#perform" do
     subject do
       Ryori::Makers::FileMaker.new("/path/to/file")
     end
@@ -47,8 +47,9 @@ describe Ryori::Makers::FileMaker do
         it "should set :identical status" do
           File.expects(:exist?).returns(true)
           File.expects(:read).with("/path/to/file").returns("testing")
-          subject.perform!.should == :identical
-          subject.should be_identical
+          maker = subject
+          maker.perform.should == :identical
+          maker.should be_identical
         end
       end
       
@@ -60,8 +61,9 @@ describe Ryori::Makers::FileMaker do
         it "should set :conflict status" do
           File.expects(:exist?).returns(true)
           File.expects(:read).with("/path/to/file").returns("not-testing")
-          subject.perform!.should == :conflict
-          subject.should be_conflict
+          maker = subject
+          maker.perform.should == :conflict
+          maker.should be_conflict
         end
         
         context "and force mode is on" do
@@ -72,9 +74,10 @@ describe Ryori::Makers::FileMaker do
           it "should overwrite current file" do
             File.expects(:exist?).returns(true)
             File.expects(:read).with("/path/to/file").returns("not-testing")
-            subject.expects(:create_file!).returns(true)
-            subject.perform!.should == :updated
-            subject.should be_updated
+            maker = subject
+            maker.expects(:create_file!).returns(true)
+            maker.perform.should == :updated
+            maker.should be_updated
           end
         end
       end
@@ -85,16 +88,18 @@ describe Ryori::Makers::FileMaker do
         it "should set :created status" do
           File.expects(:open).with("/path/to/file", "w+").returns(true)
           FileUtils.expects(:chmod).with(644, "/path/to/file").returns(true)
-          subject.perform!.should == :created
-          subject.should be_created
+          maker = subject
+          maker.perform.should == :created
+          maker.should be_created
         end
       end
       
       context "and user don't have access to create it" do
         it "should set :noaccess status" do
           File.expects(:open).with("/path/to/file", "w+").raises(Errno::EACCES)
-          subject.perform!.should == :noaccess
-          subject.should be_noaccess
+          maker = subject
+          maker.perform.should == :noaccess
+          maker.should be_noaccess
         end
       end
     end
@@ -102,16 +107,18 @@ describe Ryori::Makers::FileMaker do
     context "when unknown error raised while creating file" do
       it "shouldn't create it and set :noaccess status" do
         File.expects(:open).with("/path/to/file", "w+").raises(Exception)
-        subject.perform!.should == :error
-        subject.should be_error
+        maker = subject
+        maker.perform.should == :error
+        maker.should be_error
       end
     end
     
     context "when file can't be created or chmod not set" do
       it "shouldn't create it and set :error status" do
         File.expects(:open).with("/path/to/file", "w+").returns(false)
-        subject.perform!.should == :error
-        subject.should be_error
+        maker = subject
+        maker.perform.should == :error
+        maker.should be_error
       end
     end
   end

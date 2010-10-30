@@ -15,7 +15,7 @@ module Ryori
         force! if options[:force]
       end
     
-      def perform!
+      def perform
       
       end
       
