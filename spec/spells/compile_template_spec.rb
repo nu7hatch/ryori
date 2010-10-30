@@ -1,8 +1,8 @@
 require File.expand_path("../../spec_helper", __FILE__)
 
-describe Ryori::Makers::FileCompiler do
+describe Wizard::Spells::CompileTemplate do
   subject do
-    Ryori::Makers::FileCompiler
+    Wizard::Spells::CompileTemplate
   end
   
   describe "#initialize" do
@@ -35,7 +35,7 @@ describe Ryori::Makers::FileCompiler do
   
   context "#perform" do
     subject do
-      Ryori::Makers::FileCompiler.new("/path/to/file", "/path/to/tpl")
+      Wizard::Spells::CompileTemplate.new("/path/to/file", "/path/to/tpl")
     end
     
     context "when given template causes errors" do

@@ -1,6 +1,8 @@
-module Ryori
-  module Makers
-    class FileUpdater < FileMaker
+require 'wizard/spells/make_file'
+
+module Wizard
+  module Spells
+    class UpdateFile < MakeFile
     
       attr_reader :filename, :chmod, :content, :before, :after, :replace
       attr_status :missing
@@ -38,6 +40,6 @@ module Ryori
         end
       end
       
-    end # FileUpdater
-  end # Makers
-end # Ryori
+    end # UpdateFile
+  end # Spells
+end # Wizard

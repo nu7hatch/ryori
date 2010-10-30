@@ -1,5 +1,5 @@
-module Ryori
-  module Makers
+module Wizard
+  module Spells
     class Base
 
       include Helpers
@@ -11,6 +11,7 @@ module Ryori
         end
         
         # Set force mode for all apps. 
+        # XXX. deadlocks can raise here. 
         def force_all!
           @@force_all = true
         end
@@ -79,5 +80,5 @@ module Ryori
       end
       
     end # Base
-  end # Makers
-end # Ryori
+  end # Spells
+end # Wizard

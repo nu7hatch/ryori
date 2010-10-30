@@ -1,12 +1,12 @@
 require File.expand_path("../spec_helper", __FILE__)
 
-describe Ryori::Makers do
+describe Wizard::Spells do
   
 end
 
-describe Ryori::Makers::Base do
+describe Wizard::Spells::Base do
   subject do
-    Ryori::Makers::Base
+    Wizard::Spells::Base
   end
   
   describe ".all_forced?" do
@@ -16,7 +16,7 @@ describe Ryori::Makers::Base do
   end
   
   describe ".force_all!" do
-    it "should set force mode for all makers" do
+    it "should set force mode for all Spells" do
       subject.force_all!
       subject.should be_all_forced
     end

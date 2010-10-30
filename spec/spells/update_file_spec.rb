@@ -1,8 +1,8 @@
 require File.expand_path("../../spec_helper", __FILE__)
 
-describe Ryori::Makers::FileUpdater do
+describe Wizard::Spells::UpdateFile do
   subject do
-    Ryori::Makers::FileUpdater
+    Wizard::Spells::UpdateFile
   end
   
 end

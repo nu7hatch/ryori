@@ -1,8 +1,8 @@
 require File.expand_path("../../spec_helper", __FILE__)
 
-describe Ryori::Makers::FileMaker do
+describe Wizard::Spells::MakeFile do
   subject do
-    Ryori::Makers::FileMaker
+    Wizard::Spells::MakeFile
   end
   
   describe "#initialize" do
@@ -35,12 +35,12 @@ describe Ryori::Makers::FileMaker do
   
   describe "#perform" do
     subject do
-      Ryori::Makers::FileMaker.new("/path/to/file")
+      Wizard::Spells::MakeFile.new("/path/to/file")
     end
 
     context "when given file exists" do
       subject do
-        Ryori::Makers::FileMaker.new("/path/to/file", "testing")
+        Wizard::Spells::MakeFile.new("/path/to/file", "testing")
       end
 
       context "and it content is identical as given one" do
@@ -55,7 +55,7 @@ describe Ryori::Makers::FileMaker do
       
       context "and it content is different than given one" do
         subject do
-          Ryori::Makers::FileMaker.new("/path/to/file", "testing")
+          Wizard::Spells::MakeFile.new("/path/to/file", "testing")
         end
         
         it "should set :conflict status" do
@@ -68,7 +68,7 @@ describe Ryori::Makers::FileMaker do
         
         context "and force mode is on" do
           subject do
-            Ryori::Makers::FileMaker.new("/path/to/file", "testing", :force => true)
+            Wizard::Spells::MakeFile.new("/path/to/file", "testing", :force => true)
           end
       
           it "should overwrite current file" do

@@ -6,8 +6,7 @@ require 'stringio'
 require 'ostruct'
 require 'rspec'
 require 'mocha'
-
-require 'ryori'
+require 'wizard'
 
 module Helpers
   # Capture and silence output streams (stdout, stderr), and return it values.

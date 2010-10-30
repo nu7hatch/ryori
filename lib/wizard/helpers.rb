@@ -1,4 +1,4 @@
-module Ryori
+module Wizard
   module Helpers
   
     COLORS = {
@@ -60,4 +60,4 @@ module Ryori
     end
     
   end # Helpers
-end # Ryori
+end # Wizard

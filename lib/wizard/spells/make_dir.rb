@@ -1,6 +1,6 @@
-module Ryori
-  module Makers
-    class DirMaker < Base
+module Wizard
+  module Spells
+    class MakeDir < Base
     
       attr_reader :dirname, :chmod
       attr_status :created, :exist, :noaccess
@@ -20,6 +20,6 @@ module Ryori
         error!
       end
       
-    end # Dirmaker
-  end # Makers
-end # Ryori
+    end # MakeDir
+  end # Spells
+end # Wizard

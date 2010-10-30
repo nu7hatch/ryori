@@ -1,8 +1,8 @@
 require File.expand_path("../../spec_helper", __FILE__)
 
-describe Ryori::Makers::DirMaker do
+describe Wizard::Spells::MakeDir do
   subject do
-    Ryori::Makers::DirMaker
+    Wizard::Spells::MakeDir
   end
   
   describe "#initialize" do
@@ -23,7 +23,7 @@ describe Ryori::Makers::DirMaker do
   
   describe "#perform" do
     subject do
-      Ryori::Makers::DirMaker.new("/path/to/dir")
+      Wizard::Spells::MakeDir.new("/path/to/dir")
     end
     
     context "when given directory exists" do

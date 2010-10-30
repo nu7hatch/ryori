@@ -1,6 +1,6 @@
-module Ryori
-  module Makers
-    class FileMaker < Base
+module Wizard
+  module Spells
+    class MakeFile < Base
     
       attr_reader :filename, :chmod, :content
       attr_status :created, :noaccess, :identical, :conflict, :updated
@@ -38,6 +38,6 @@ module Ryori
         File.read(filename) == content
       end
       
-    end # Filemaker
-  end # Makers
-end # Ryori
+    end # MakeFile
+  end # Spells
+end # Wizard

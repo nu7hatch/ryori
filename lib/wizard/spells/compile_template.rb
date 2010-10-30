@@ -1,8 +1,9 @@
-require "erb"
+require 'wizard/spells/make_file'
+require 'erb'
 
-module Ryori
-  module Makers
-    class FileCompiler < FileMaker
+module Wizard
+  module Spells
+    class CompileTemplate < MakeFile
     
       attr_reader :template
     
@@ -17,6 +18,6 @@ module Ryori
         error!
       end
       
-    end # FileUpdater
-  end # Makers
-end # Ryori
+    end # CompileTemplate
+  end # Spells
+end # Wizard
