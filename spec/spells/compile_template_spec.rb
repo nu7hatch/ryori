@@ -38,22 +38,22 @@ describe Wizard::Spells::CompileTemplate do
       Wizard::Spells::CompileTemplate.new("/path/to/file", "/path/to/tpl")
     end
     
-    context "when given template causes errors" do
+    context "when specified template causes errors" do
       it "should set :error state" do
         File.expects(:read).with("/path/to/tpl").raises(Exception)
-        maker = subject
-        maker.perform.should == :error
-        maker.should be_error
+        spell = subject
+        spell.perform.should == :error
+        spell.should be_error
       end
     end
     
-    context "when given template is ok" do
-      it "should run FileMaker on given file" do
+    context "when specified template is ok" do
+      it "should compile it and invoke make_file" do
         File.expects(:read).with("/path/to/tpl").returns("<%='test'%>")
-        ERB.expects(:new).returns(stub(:result => false))
-        maker = subject
-        maker.perform.should == false
-        maker.content.should == false
+        spell = subject
+        spell.expects(:perform_without_template_compilation).returns(:created)
+        spell.perform.should == :created
+        spell.content.should == 'test'
       end
     end
   end

@@ -26,31 +26,31 @@ describe Wizard::Spells::MakeDir do
       Wizard::Spells::MakeDir.new("/path/to/dir")
     end
     
-    context "when given directory exists" do
+    context "when specified directory exists" do
       it "should set :exist status" do
         File.expects(:exist?).returns(true)
-        maker = subject
-        maker.perform.should == :exist
-        maker.should be_exist
+        spell = subject
+        spell.perform.should == :exist
+        spell.should be_exist
       end
     end
     
-    context "when given directory doesn't exist" do
+    context "when specified directory doesn't exist" do
       context "and user have access to create it" do
         it "should set :created status" do
           FileUtils.expects(:mkdir_p).with("/path/to/dir", :mode => 644).returns("/path/to/dir")
-          maker = subject
-          maker.perform.should == :created
-          maker.should be_created
+          spell = subject
+          spell.perform.should == :created
+          spell.should be_created
         end
       end
       
       context "and user don't have access to create it" do
         it "should set :noaccess status" do
           FileUtils.expects(:mkdir_p).with("/path/to/dir", :mode => 644).raises(Errno::EACCES)
-          maker = subject
-          maker.perform.should == :noaccess
-          maker.should be_noaccess
+          spell = subject
+          spell.perform.should == :noaccess
+          spell.should be_noaccess
         end
       end
     end
@@ -58,18 +58,18 @@ describe Wizard::Spells::MakeDir do
     context "when unknown error raised while creating directory" do
       it "shouldn't create it and set :noaccess status" do
         FileUtils.expects(:mkdir_p).with("/path/to/dir", :mode => 644).raises(Exception)
-        maker = subject
-        maker.perform.should == :error
-        maker.should be_error
+        spell = subject
+        spell.perform.should == :error
+        spell.should be_error
       end
     end
     
     context "when directory can't been created" do
       it "shouldn't create it and set :error status" do
         FileUtils.expects(:mkdir_p).with("/path/to/dir", :mode => 644).returns(false)
-        maker = subject
-        maker.perform.should == :error
-        maker.should be_error
+        spell = subject
+        spell.perform.should == :error
+        spell.should be_error
       end
     end
   end

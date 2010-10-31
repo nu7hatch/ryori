@@ -16,27 +16,39 @@ module Wizard
         @replace   = options[:replace]
       end
     
-      def perform
-        return missing! unless File.exist?(filename)
-        prepare_content and super
+      def perform_with_content_update
+        if File.exist?(filename)
+          force! and build_content and perform_without_content_update
+        elsif content && !before && !after && !replace
+          perform_without_content_update
+        else
+          missing!
+        end
       rescue Object
         error!
       end
       
-      def prepare_content
+      alias_method :perform_without_content_update, :perform
+      alias_method :perform, :perform_with_content_update
+      
+      def build_content
         if (before || after) && !replace
-          old_content = File.read(filename)
-          return @content += old_content if before == true
-          return @content = old_content+@content if after == true
+          content = File.read(filename)
           
-          (old_content = old_content.split(/$/)).each_with_index do |line, id|
-            old_content[id] = [content, line].join("\n") if before && !after && line =~ before
-            old_content[id] = [line, content].join("\n") if after && !before && line =~ after
+          return @content = [@content, content].join("\n") if after == :BOF
+          return @content = [content, @content].join("\n") if before == :EOF
+          
+          content = content.sub(/\r/, "").split(/\r?\n/)
+          content.each_with_index do |line, id|
+            content[id] = [@content, line].join("\n") if !after && before && line =~ before
+            content[id] = [line, @content].join("\n") if !before && after && line =~ after
           end
           
-          @content = old_content.join
+          @content = content.join("\n")
         elsif replace
           @content = File.read(filename).sub(replace, @content)
+        else
+          @content
         end
       end
       
