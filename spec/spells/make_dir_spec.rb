@@ -10,8 +10,8 @@ describe Wizard::Spells::MakeDir do
       subject.new("/path/to/dir").dirname.should == "/path/to/dir"
     end
     
-    it "should set default chmod" do
-      subject.new("/path/to/dir").chmod.should == 644
+    it "should have empty chmod by default" do
+      subject.new("/path/to/dir").chmod.should == nil
     end
     
     context "given :mode" do

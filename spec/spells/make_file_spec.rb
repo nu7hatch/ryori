@@ -16,8 +16,8 @@ describe Wizard::Spells::MakeFile do
       end
     end
     
-    it "should set default chmod" do
-      subject.new("/path/to/file").chmod.should == 644
+    it "should have empty chmod by default" do
+      subject.new("/path/to/file").chmod.should == nil
     end
     
     context "given :mode option" do

@@ -6,6 +6,7 @@ module Wizard
     require "wizard/spells/make_file"
     require "wizard/spells/update_file"
     require "wizard/spells/compile_template"
+    require "wizard/spells/execute_shell"
     
   end # Spells
 end # Wizard

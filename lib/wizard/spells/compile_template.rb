@@ -9,7 +9,7 @@ module Wizard
     
       def initialize(filename, template, options={})
         super(filename, nil, options)
-        @template  = template
+        @template = template
       end
     
       def perform_with_template_compilation
